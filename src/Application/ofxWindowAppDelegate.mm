@@ -20,11 +20,11 @@
 }
 
 -(void)applicationWillFinishLaunching:(NSNotification *)notification{
-    // NO CALL TO SUPERCLASS METHOD HERE!!!
+    // DO NOT CALL TO SUPERCLASS METHOD HERE!!!
 }
 
 -(void)applicationDidFinishLaunching:(NSNotification *)notification{
-    // NO CALL TO SUPERCLASS METHOD HERE!!!
+    // DO NOT CALL TO SUPERCLASS METHOD HERE!!!
     self.windowController = [[SetupWindowController alloc] initWithWindowNibName:@"SetupWindow"];
     [self.windowController showWindow:nil];
 }
