@@ -69,9 +69,9 @@
     NSRect contentSize = NSMakeRect( 0.0f, 0.0f, width, height );
     
     // This is where the nibless window happens
-    self.openGLWindow = [ [ NSWindow alloc ] initWithContentRect : contentSize 
-                                                       styleMask : NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask
-                                                         backing : NSBackingStoreBuffered 
+    self.openGLWindow = [ [ NSWindow alloc ] initWithContentRect : contentSize
+                                                       styleMask : NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask
+                                                         backing : NSBackingStoreBuffered
                                                            defer : NO ];
     
     [ self.openGLWindow setLevel : NSNormalWindowLevel ];
@@ -81,6 +81,9 @@
     [ self.openGLView setDelegate: self ];
     
     [ self.openGLWindow setContentView : self.openGLView ];
+    
+    //listen for window resized notifications
+    [ [ NSNotificationCenter defaultCenter] addObserver:self selector: @selector(windowDidResize:) name:NSWindowDidResizeNotification object: self.openGLWindow ];
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification
@@ -133,6 +136,24 @@
         [ self.openGLView drawView ];       // must first draw content at least once, otherwise textures are not shared between the two opengl contexts.
         [ self goFullScreenOnAllDisplays ];
     }
+}
+
+- (void)windowDidResize:(NSNotification *)notification {
+    
+    //new window size
+    NSSize frameSize = [(NSWindow*)[notification object] frame].size;
+    
+    //set openGLView to new window size
+    NSRect contentSize = NSMakeRect(0, 0, frameSize.width, frameSize.height);
+    [self.openGLView setFrame:contentSize];
+    
+    //reset the window content view
+    [self.openGLWindow setContentView:nil];
+    [ self.openGLWindow setContentView : self.openGLView ];
+    
+    //notify OF of resized event taking into account the title bar size
+    int barSize = 22;
+    ofNotifyWindowResized(frameSize.width, frameSize.height - barSize);
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication 
